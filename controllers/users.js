@@ -11,9 +11,9 @@ const getUsers = (req, res) => {
 };
 
 const createUser = (req, res) => {
-  const { name, weather, avatar } = req.body;
+  const { name, avatar, likeItem, dislikeItem } = req.body;
   user
-    .create({ name, weather, avatar })
+    .create({ name, avatar, likeItem, dislikeItem })
     .then((user) => res.status(201).send(user))
     .catch((err) => {
       console.error(err);
