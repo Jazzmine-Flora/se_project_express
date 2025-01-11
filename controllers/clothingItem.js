@@ -12,4 +12,13 @@ const createItem = (req, res) => {
     });
 };
 
-module.exports = { createItem };
+const getItems = (req, res) => {
+  ClothingItem.find({})
+    .then((items) => res.status(200).send(items))
+    .catch((err) => {
+      console.error(err);
+      res.status(500).send({ message: "Get items error", err });
+    });
+};
+
+module.exports = { createItem, getItems };
