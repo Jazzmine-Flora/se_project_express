@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
-const { validate } = require("./user");
 
 const clothingItem = new mongoose.Schema({
   name: {
@@ -19,6 +18,16 @@ const clothingItem = new mongoose.Schema({
       message: "You must enter a valid URL",
     },
   },
+
+  likes: {
+    type: Number,
+    default: 0,
+  },
+
+  dislikes: {
+    type: Number,
+    default: 0,
+  },
 });
 
-module.exports = mongoose.model("clothingItem", clothingItem);
+module.exports = mongoose.model("clothingItems", clothingItem);

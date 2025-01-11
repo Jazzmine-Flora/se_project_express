@@ -19,6 +19,15 @@ const userSchema = new mongoose.Schema({
       message: "You must enter a valid URL",
     },
   },
+
+  likes: {
+    type: Array,
+    default: [],
+  },
+  dislikes: {
+    type: Array,
+    default: [],
+  },
 });
 
 module.exports = mongoose.model("user", userSchema);
