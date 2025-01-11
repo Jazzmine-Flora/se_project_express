@@ -19,12 +19,12 @@ const clothingItem = new mongoose.Schema({
     },
   },
 
-  likes: {
+  likeItem: {
     type: Number,
     default: 0,
   },
 
-  dislikes: {
+  dislikeItem: {
     type: Number,
     default: 0,
   },

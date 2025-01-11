@@ -20,11 +20,11 @@ const userSchema = new mongoose.Schema({
     },
   },
 
-  likes: {
+  likeItem: {
     type: Array,
     default: [],
   },
-  dislikes: {
+  dislikeItem: {
     type: Array,
     default: [],
   },
