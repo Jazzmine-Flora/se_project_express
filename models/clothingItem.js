@@ -5,10 +5,13 @@ const clothingItem = new mongoose.Schema({
   name: {
     type: String,
     required: true,
+    minlength: 2,
+    maxlength: 30,
   },
   weather: {
     type: String,
     required: true,
+    enum: ["hot", "warm", "cold"],
   },
   imageUrl: {
     type: String,
@@ -18,15 +21,19 @@ const clothingItem = new mongoose.Schema({
       message: "You must enter a valid URL",
     },
   },
-
-  likeItem: {
-    type: Number,
-    default: 0,
+  owner: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "user",
+    required: true,
+  },
+  likes: {
+    type: Array,
+    default: [],
   },
 
-  dislikeItem: {
-    type: Number,
-    default: 0,
+  createdAt: {
+    type: Date,
+    default: Date.now,
   },
 });
 
