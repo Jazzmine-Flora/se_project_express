@@ -11,7 +11,7 @@ const createItem = (req, res) => {
     .catch((err) => {
       console.error(err);
       if (err.name === "ValidationError") {
-        return res.status(400).send({ message: err.message });
+        return errors.BAD_REQUEST.send({ message: err.message });
       }
       return errors.DEFAULT.send({ message: err.message });
     });
@@ -50,7 +50,7 @@ const deleteItem = (req, res) => {
     .then((item) => res.status(200).send({ data: item }))
     .catch((err) => {
       if (err.name === "CastError") {
-        return res.status(400).send({ message: err.message });
+        return errors.BAD_REQUEST.send({ message: err.message });
       }
       console.error(err);
       errors.DEFAULT.send({ message: "Delete items error" });
@@ -69,7 +69,7 @@ const likeItem = (req, res) => {
     .then((item) => res.status(200).send({ data: item }))
     .catch((err) => {
       if (err.name === "CastError") {
-        return res.status(400).send({ message: err.message });
+        return errors.BAD_REQUEST.send({ message: err.message });
       }
       console.error(err);
       res.status(500).send({ message: "Like items error" });
