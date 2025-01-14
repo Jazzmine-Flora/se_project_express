@@ -6,8 +6,6 @@ const errors = require("../utils/errors");
 router.use("/clothingItems", clothingItem);
 router.use("/users", userRouter);
 
-router.use((req, res) =>
-  errors.NOT_FOUND.send({ message: "Router Not found" })
-);
+router.use(() => errors.NOT_FOUND.send({ message: "Router Not found" }));
 
 module.exports = router;
