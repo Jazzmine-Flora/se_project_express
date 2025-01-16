@@ -5,7 +5,7 @@ const { BAD_REQUEST, DEFAULT, NOT_FOUND } = require("../utils/errors");
 const createItem = (req, res) => {
   const { name, weather, imageUrl } = req.body;
   clothingItems
-    .create({ name, weather, imageUrl, owner: req.user.Id })
+    .create({ name, weather, imageUrl, owner: req.user._id })
     .then((item) => {
       res.send({ data: item });
     })
@@ -55,14 +55,18 @@ const deleteItem = (req, res) => {
       if (errors.name === "CastError") {
         return res.status(BAD_REQUEST).send({ message: errors.message });
       }
-      return res.status(500).send({ message: "Delete item error" });
+      return res.status(DEFAULT).send({ message: "Delete item error" });
     });
 };
 
 const likeItem = (req, res) => {
-  const { Id } = req.params;
+  const { itemId } = req.params;
   clothingItems
-    .findByIdAndUpdate(Id, { $addToSet: { likes: req.user.Id } }, { new: true })
+    .findByIdAndUpdate(
+      itemId,
+      { $addToSet: { likes: req.user._id } },
+      { new: true }
+    )
     .orFail()
     .then((item) => {
       res.status(200).send({ data: item });
@@ -79,9 +83,13 @@ const likeItem = (req, res) => {
 };
 
 const dislikeItem = (req, res) => {
-  const { Id } = req.params;
+  const { itemId } = req.params;
   clothingItems
-    .findByIdAndUpdate(Id, { $pull: { likes: req.user.Id } }, { new: true })
+    .findByIdAndUpdate(
+      itemId,
+      { $pull: { likes: req.user._id } },
+      { new: true }
+    )
     .orFail()
     .then((item) => res.status(200).send({ data: item }))
     .catch((errors) => {

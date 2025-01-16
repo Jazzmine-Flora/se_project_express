@@ -22,7 +22,7 @@ const createUser = (req, res) => {
       if (errors.name === "ValidationError") {
         return res.status(BAD_REQUEST).send({ message: errors.message });
       }
-      return DEFAULT.send({ message: errors.message });
+      return res.status(DEFAULT).send({ message: errors.message });
     });
 };
 
@@ -31,7 +31,7 @@ const getUser = (req, res) => {
   user
     .findById(userId)
     .orFail()
-    .then(() => res.status(200).send({ data: user }))
+    .then((userData) => res.status(200).send({ data: userData }))
     .catch((errors) => {
       console.error(errors);
       if (errors.name === "DocumentNotFoundError") {
