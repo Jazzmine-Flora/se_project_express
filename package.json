@@ -12,6 +12,7 @@
   "author": "Taliba Sadiq",
   "license": "ISC",
   "dependencies": {
+    "bcrypt": "^5.1.1",
     "express": "^4.21.2",
     "mongoose": "^6.6.1",
     "validator": "^13.12.0"
