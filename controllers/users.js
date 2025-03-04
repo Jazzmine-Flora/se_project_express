@@ -9,15 +9,15 @@ const {
   UNAUTHORIZED,
 } = require("../utils/errors");
 
-const getUsers = (req, res) => {
-  user
-    .find({})
-    .then((users) => res.status(200).send(users))
-    .catch((errors) => {
-      console.error(errors);
-      return res.status(DEFAULT).send({ message: errors.message });
-    });
-};
+// const getUsers = (req, res) => {
+//   user
+//     .find({})
+//     .then((users) => res.status(200).send(users))
+//     .catch((errors) => {
+//       console.error(errors);
+//       return res.status(DEFAULT).send({ message: errors.message });
+//     });
+// };
 
 const createUser = async (req, res) => {
   const { name, avatar, likeItem, dislikeItem, email, password } = req.body;
@@ -63,8 +63,7 @@ const createUser = async (req, res) => {
 
 const getUser = (req, res) => {
   const { userId } = req.params;
-  user
-    .findById(userId)
+  User.findById(userId)
     .orFail()
     .then((userData) => res.status(200).send({ data: userData }))
     .catch((errors) => {
@@ -94,7 +93,6 @@ const login = async (req, res) => {
 };
 
 module.exports = {
-  getUsers,
   createUser,
   getUser,
   login,
