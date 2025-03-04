@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
-// const { validate } = require("./clothingItem");
+const bcrypt = require("bcrypt");
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -42,5 +42,19 @@ const userSchema = new mongoose.Schema({
     select: false,
   },
 });
+
+userSchema.statics.findUserByCredentials = async function (email, password) {
+  const user = await this.findOne({ email });
+  if (!user) {
+    throw new Error("Invalid email or password");
+  }
+
+  const isPasswordMatch = await bcrypt.compare(password, user.password);
+  if (!isPasswordMatch) {
+    throw new Error("Invalid email or password");
+  }
+
+  return user;
+};
 
 module.exports = mongoose.model("user", userSchema);
