@@ -24,7 +24,7 @@ const createUser = async (req, res) => {
       password: hashedPassword,
     });
 
-    const userWithoutPassword = newUser.toObject();
+    const userWithoutPassword = user.toObject();
     delete userWithoutPassword.password;
     res.status(201).send(userWithoutPassword); // Return the created user
   } catch (errors) {
