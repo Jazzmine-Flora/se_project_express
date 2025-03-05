@@ -9,16 +9,6 @@ const {
   UNAUTHORIZED,
 } = require("../utils/errors");
 
-// const getUsers = (req, res) => {
-//   user
-//     .find({})
-//     .then((users) => res.status(200).send(users))
-//     .catch((errors) => {
-//       console.error(errors);
-//       return res.status(DEFAULT).send({ message: errors.message });
-//     });
-// };
-
 const createUser = async (req, res) => {
   const { name, avatar, email, password } = req.body;
 
@@ -27,14 +17,14 @@ const createUser = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Create the user
-    await User.create({
+    const user = await User.create({
       name,
       avatar,
       email,
       password: hashedPassword,
     });
 
-    res.status(201).send({ message: "User created" });
+    res.status(201).send(user); // Return the created user
   } catch (errors) {
     if (errors.code === 11000) {
       // Handle duplicate email error
@@ -44,20 +34,6 @@ const createUser = async (req, res) => {
     res.status(400).send({ message: errors.message });
   }
 };
-
-// const createUser = (req, res) => {
-//   const { name, avatar, likeItem, dislikeItem, email, password } = req.body;
-//   user
-//     .create({ name, avatar, likeItem, dislikeItem })
-//     .then(() => res.status(201).send({ message: "User created" }))
-//     .catch((errors) => {
-//       console.error(errors);
-//       if (errors.name === "ValidationError") {
-//         return res.status(BAD_REQUEST).send({ message: errors.message });
-//       }
-//       return res.status(DEFAULT).send({ message: errors.message });
-//     });
-// };
 
 const getUser = (req, res) => {
   const { userId } = req.params;
