@@ -1,8 +1,7 @@
 const express = require("express");
-
 const mongoose = require("mongoose");
-
 const routes = require("./routes");
+const auth = require("./middlewares/auth");
 
 const app = express();
 const { PORT = 3001 } = process.env;
@@ -22,6 +21,13 @@ app.use((req, res, next) => {
   next();
 });
 
+// Public routes
+app.post("/signin", require("./controllers/users").login);
+app.post("/signup", require("./controllers/users").createUser);
+app.use("/items", require("./routes/clothingItems"));
+
+// Protected routes
+app.use(auth);
 app.use(routes);
 
 app.listen(PORT, () => {
