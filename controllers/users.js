@@ -20,7 +20,7 @@ const {
 // };
 
 const createUser = async (req, res) => {
-  const { name, avatar, likeItem, dislikeItem, email, password } = req.body;
+  const { name, avatar, email, password } = req.body;
 
   try {
     // Hash the password
@@ -30,8 +30,6 @@ const createUser = async (req, res) => {
     await User.create({
       name,
       avatar,
-      likeItem,
-      dislikeItem,
       email,
       password: hashedPassword,
     });

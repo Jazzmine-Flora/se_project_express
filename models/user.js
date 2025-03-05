@@ -19,14 +19,7 @@ const userSchema = new mongoose.Schema({
       message: "You must enter a valid URL",
     },
   },
-  likeItem: {
-    type: String,
-    required: true,
-  },
-  dislikeItem: {
-    type: String,
-    required: true,
-  },
+ 
   email: {
     type: String,
     required: true,
