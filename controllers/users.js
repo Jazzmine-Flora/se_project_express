@@ -24,7 +24,9 @@ const createUser = async (req, res) => {
       password: hashedPassword,
     });
 
-    res.status(201).send(user); // Return the created user
+    const userWithoutPassword = newUser.toObject();
+    delete userWithoutPassword.password;
+    res.status(201).send(userWithoutPassword); // Return the created user
   } catch (errors) {
     if (errors.code === 11000) {
       // Handle duplicate email error
