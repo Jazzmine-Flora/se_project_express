@@ -37,8 +37,8 @@ const createUser = async (req, res) => {
   }
 };
 
-const getUser = (req, res) => {
-  const { userId } = req.params;
+const getCurrentUser = (req, res) => {
+  const userId = req.user._id; // Ensure req.user._id is correctly accessed
   User.findById(userId)
     .orFail()
     .then((userData) => res.status(200).send({ data: userData }))
@@ -50,7 +50,7 @@ const getUser = (req, res) => {
       if (errors.name === "CastError") {
         return res.status(BAD_REQUEST).send({ message: errors.message });
       }
-      return DEFAULT.send({ message: errors.message });
+      return res.status(DEFAULT).send({ message: errors.message });
     });
 };
 
@@ -62,6 +62,7 @@ const login = async (req, res) => {
     const token = jwt.sign({ _id: user._id }, JWT_SECRET, { expiresIn: "7d" });
     res.send({ token });
   } catch (errors) {
+    console.error(errors); // Log the error for debugging
     return res
       .status(UNAUTHORIZED)
       .send({ message: "Invalid email or password" });
@@ -70,6 +71,6 @@ const login = async (req, res) => {
 
 module.exports = {
   createUser,
-  getUser,
+  getCurrentUser,
   login,
 };

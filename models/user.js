@@ -19,7 +19,7 @@ const userSchema = new mongoose.Schema({
       message: "You must enter a valid URL",
     },
   },
- 
+
   email: {
     type: String,
     required: true,
@@ -37,7 +37,7 @@ const userSchema = new mongoose.Schema({
 });
 
 userSchema.statics.findUserByCredentials = async function (email, password) {
-  const user = await this.findOne({ email });
+  const user = await this.findOne({ email }).select("+password");
   if (!user) {
     throw new Error("Invalid email or password");
   }
@@ -50,4 +50,6 @@ userSchema.statics.findUserByCredentials = async function (email, password) {
   return user;
 };
 
-module.exports = mongoose.model("user", userSchema);
+const User = mongoose.model("User", userSchema);
+
+module.exports = User;
