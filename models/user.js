@@ -37,18 +37,39 @@ const userSchema = new mongoose.Schema({
 });
 
 userSchema.statics.findUserByCredentials = async function (email, password) {
+  console.log("Finding user with email:", email); // Debugging log
   const user = await this.findOne({ email }).select("+password");
   if (!user) {
+    console.log("User not found"); // Debugging log
     throw new Error("Invalid email or password");
   }
+
+  console.log("User found:", user); // Debugging log
 
   const isPasswordMatch = await bcrypt.compare(password, user.password);
   if (!isPasswordMatch) {
+    console.log("Password does not match"); // Debugging log
     throw new Error("Invalid email or password");
   }
 
+  console.log("Password matches"); // Debugging log
+
   return user;
 };
+
+// userSchema.statics.findUserByCredentials = async function (email, password) {
+//   const user = await this.findOne({ email }).select("+password");
+//   if (!user) {
+//     throw new Error("Invalid email or password");
+//   }
+
+//   const isPasswordMatch = await bcrypt.compare(password, user.password);
+//   if (!isPasswordMatch) {
+//     throw new Error("Invalid email or password");
+//   }
+
+//   return user;
+// };
 
 const User = mongoose.model("User", userSchema);
 

@@ -2,6 +2,29 @@
 const clothingItems = require("../models/clothingItem");
 const { BAD_REQUEST, DEFAULT, NOT_FOUND } = require("../utils/errors");
 
+const deleteClothingItem = async (req, res) => {
+  const { itemId } = req.params;
+  const userId = req.user._id;
+
+  try {
+    const item = await ClothingItem.findById(itemId).orFail();
+
+    if (item.owner.toString() !== userId) {
+      return res
+        .status(FORBIDDEN)
+        .send({ message: "You do not have permission to delete this item" });
+    }
+
+    await item.remove();
+    res.status(200).send({ message: "Item deleted successfully" });
+  } catch (errors) {
+    console.error(errors);
+    if (errors.name === "DocumentNotFoundError") {
+      return res.status(NOT_FOUND).send({ message: "Item not found" });
+    }
+    return res.status(DEFAULT).send({ message: errors.message });
+  }
+};
 const createItem = (req, res) => {
   const { name, weather, imageUrl } = req.body;
   clothingItems
@@ -40,24 +63,6 @@ const getItems = (req, res) => {
 //       res.status(500).send({ message: "Update items error" });
 //     });
 // };
-
-const deleteItem = (req, res) => {
-  const { itemId } = req.params;
-
-  clothingItems
-    .findByIdAndRemove(itemId)
-    .orFail()
-    .then((item) => res.status(200).send({ data: item }))
-    .catch((errors) => {
-      if (errors.name === "DocumentNotFoundError") {
-        return res.status(NOT_FOUND).send({ message: errors.message });
-      }
-      if (errors.name === "CastError") {
-        return res.status(BAD_REQUEST).send({ message: errors.message });
-      }
-      return res.status(DEFAULT).send({ message: "Delete item error" });
-    });
-};
 
 const likeItem = (req, res) => {
   const { itemId } = req.params;
@@ -104,9 +109,9 @@ const dislikeItem = (req, res) => {
 };
 
 module.exports = {
+  deleteClothingItem,
   createItem,
   getItems,
-  deleteItem,
   likeItem,
   dislikeItem,
 };
