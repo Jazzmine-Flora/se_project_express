@@ -1,5 +1,6 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const cors = require("cors");
 const routes = require("./routes");
 const auth = require("./middlewares/auth");
 
@@ -20,6 +21,8 @@ app.use(express.json());
 //   };
 //   next();
 // });
+
+app.use(cors());
 
 // Public routes
 app.post("/signin", require("./controllers/users").login);
