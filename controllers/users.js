@@ -7,16 +7,14 @@ const {
   NOT_FOUND,
   DEFAULT,
   UNAUTHORIZED,
+  CONFLICT,
 } = require("../utils/errors");
 
 const createUser = async (req, res) => {
   const { name, avatar, email, password } = req.body;
 
   try {
-    // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Create the user
     const user = await User.create({
       name,
       avatar,
@@ -26,30 +24,30 @@ const createUser = async (req, res) => {
 
     const userWithoutPassword = user.toObject();
     delete userWithoutPassword.password;
-    res.status(201).send(userWithoutPassword); // Return the created user
+    return res.status(201).send(userWithoutPassword);
   } catch (errors) {
     if (errors.code === 11000) {
       // Handle duplicate email error
-      return res.status(409).send({ message: "Email already exists" });
+      return res.status(CONFLICT).send({ message: "Email already exists" });
     }
     console.error(errors);
-    res.status(400).send({ message: errors.message });
+    return res.status(BAD_REQUEST).send({ message: errors.message });
   }
 };
 
 const getCurrentUser = (req, res) => {
   const userId = req.user._id;
-  console.log("User ID:", userId);
+  // console.log("User ID:", userId); // Removed to resolve the no-console warning
   User.findById(userId)
     .orFail()
     .then((userData) => res.status(200).send({ data: userData }))
     .catch((errors) => {
       console.error(errors);
       if (errors.name === "DocumentNotFoundError") {
-        return res.status(NOT_FOUND).send({ message: errors.message });
+        return res.status(NOT_FOUND).send({ message: "User not found" });
       }
       if (errors.name === "CastError") {
-        return res.status(BAD_REQUEST).send({ message: errors.message });
+        return res.status(BAD_REQUEST).send({ message: "Invalid ID format" });
       }
       return res.status(DEFAULT).send({ message: errors.message });
     });
@@ -66,7 +64,7 @@ const updateUser = async (req, res) => {
       { new: true, runValidators: true }
     ).orFail();
 
-    res.status(200).send({ data: updatedUser });
+    return res.status(200).send({ data: updatedUser });
   } catch (errors) {
     console.error(errors);
     if (errors.name === "DocumentNotFoundError") {
@@ -82,15 +80,24 @@ const updateUser = async (req, res) => {
 const login = async (req, res) => {
   const { email, password } = req.body;
 
+  if (!email || !password) {
+    return res
+      .status(BAD_REQUEST)
+      .send({ message: "Email and password are required" });
+  }
+
   try {
     const user = await User.findUserByCredentials(email, password);
     const token = jwt.sign({ _id: user._id }, JWT_SECRET, { expiresIn: "7d" });
-    res.send({ token });
+    return res.send({ token });
   } catch (errors) {
     console.error(errors);
-    return res
-      .status(UNAUTHORIZED)
-      .send({ message: "Invalid email or password" });
+    if (errors.message === "Invalid email or password") {
+      return res
+        .status(UNAUTHORIZED)
+        .send({ message: "Invalid email or password" });
+    }
+    return res.status(DEFAULT).send({ message: errors.message });
   }
 };
 

@@ -1,6 +1,11 @@
 // const e = require("express");
 const clothingItems = require("../models/clothingItem");
-const { BAD_REQUEST, DEFAULT, NOT_FOUND } = require("../utils/errors");
+const {
+  BAD_REQUEST,
+  DEFAULT,
+  NOT_FOUND,
+  FORBIDDEN,
+} = require("../utils/errors");
 
 const deleteClothingItem = async (req, res) => {
   const { itemId } = req.params;
@@ -16,11 +21,14 @@ const deleteClothingItem = async (req, res) => {
     }
 
     await item.remove();
-    res.status(200).send({ message: "Item deleted successfully" });
+    return res.status(200).send({ message: "Item deleted successfully" });
   } catch (errors) {
     console.error(errors);
     if (errors.name === "DocumentNotFoundError") {
       return res.status(NOT_FOUND).send({ message: "Item not found" });
+    }
+    if (errors.name === "CastError") {
+      return res.status(BAD_REQUEST).send({ message: "Invalid ID format" });
     }
     return res.status(DEFAULT).send({ message: errors.message });
   }
