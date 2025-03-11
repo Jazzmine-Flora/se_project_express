@@ -7,7 +7,7 @@ const deleteClothingItem = async (req, res) => {
   const userId = req.user._id;
 
   try {
-    const item = await ClothingItem.findById(itemId).orFail();
+    const item = await clothingItems.findById(itemId).orFail();
 
     if (item.owner.toString() !== userId) {
       return res
