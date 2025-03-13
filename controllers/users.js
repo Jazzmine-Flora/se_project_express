@@ -35,13 +35,12 @@ const createUser = async (req, res) => {
       return res.status(BAD_REQUEST).send({ message: errors.message });
     }
     console.error(errors);
-    return res.status(BAD_REQUEST).send({ message: errors.message });
+    return res.status(DEFAULT).send({ message: errors.message }); // Use DEFAULT for 500 status code
   }
 };
 
 const getCurrentUser = (req, res) => {
   const userId = req.user._id;
-  // console.log("User ID:", userId); // Removed to resolve the no-console warning
   User.findById(userId)
     .orFail()
     .then((userData) => res.status(200).send({ data: userData }))
@@ -53,7 +52,7 @@ const getCurrentUser = (req, res) => {
       if (errors.name === "CastError") {
         return res.status(BAD_REQUEST).send({ message: "Invalid ID format" });
       }
-      return res.status(DEFAULT).send({ message: errors.message });
+      return res.status(DEFAULT).send({ message: errors.message }); // Use DEFAULT for 500 status code
     });
 };
 
