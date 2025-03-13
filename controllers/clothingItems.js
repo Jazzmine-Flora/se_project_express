@@ -33,19 +33,21 @@ const deleteClothingItem = async (req, res) => {
     return res.status(DEFAULT).send({ message: errors.message });
   }
 };
-const createItem = (req, res) => {
-  const { name, weather, imageUrl } = req.body;
-  clothingItems
-    .create({ name, weather, imageUrl, owner: req.user._id })
-    .then((item) => {
-      res.send({ data: item });
-    })
-    .catch((errors) => {
-      if (errors.name === "ValidationError") {
-        return res.status(BAD_REQUEST).send({ message: "Invalid data" });
-      }
-      return res.status(DEFAULT).send({ message: "Create item error" });
-    });
+const createItem = async (req, res) => {
+  const { name, imageUrl, weather } = req.body;
+  const owner = req.user._id;
+
+  try {
+    const item = await clothingItems.create({ name, imageUrl, weather, owner });
+    return res.status(201).send({ data: item });
+  } catch (errors) {
+    if (errors.name === "ValidationError") {
+      // Handle validation error
+      return res.status(BAD_REQUEST).send({ message: errors.message });
+    }
+    console.error(errors);
+    return res.status(DEFAULT).send({ message: errors.message });
+  }
 };
 
 const getItems = (req, res) => {

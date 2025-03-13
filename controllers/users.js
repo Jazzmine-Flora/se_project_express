@@ -30,6 +30,10 @@ const createUser = async (req, res) => {
       // Handle duplicate email error
       return res.status(CONFLICT).send({ message: "Email already exists" });
     }
+    if (errors.name === "ValidationError") {
+      // Handle validation error
+      return res.status(BAD_REQUEST).send({ message: errors.message });
+    }
     console.error(errors);
     return res.status(BAD_REQUEST).send({ message: errors.message });
   }
