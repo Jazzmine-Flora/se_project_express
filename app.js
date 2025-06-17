@@ -1,7 +1,11 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+require("dotenv").config();
 const routes = require("./routes"); // Import all routes from index.js
+const errorHandler = require("./middlewares/error-handler");
+const { errors } = require("celebrate");
+const { requestLogger, errorLogger } = require("./middlewares/logger");
 
 const app = express();
 const { PORT = 3001 } = process.env;
@@ -16,9 +20,15 @@ mongoose
 app.use(express.json());
 app.use(cors());
 
+app.use(requestLogger); // before routes
 // Use routes from index.js
 app.use(routes);
 
+app.use(errorLogger);
+app.use(errors());
+// Error handling middleware
+app.use(errorHandler);
+
 app.listen(PORT, () => {
-  // console.log(`Server is running on port ${PORT}`); // Removed to resolve the no-console warning
+  console.log(`Server is running on port ${PORT}`); // Removed to resolve the no-console warning
 });

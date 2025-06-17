@@ -3,10 +3,15 @@ const userRouter = require("./users");
 const clothingItemRouter = require("./clothingItems");
 const { NOT_FOUND } = require("../utils/errors");
 const { createUser, login } = require("../controllers/users");
+const {
+  validateUserBody,
+  validateLogin,
+} = require("../middlewares/validation");
+
 // const auth = require("../middlewares/auth");
 
-router.post("/signup", createUser);
-router.post("/signin", login);
+router.post("/signup", validateUserBody, createUser);
+router.post("/signin", validateLogin, login);
 
 // Public route for getting all items
 router.use("/items", clothingItemRouter);

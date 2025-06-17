@@ -1,13 +1,12 @@
-// const e = require("express");
 const clothingItems = require("../models/clothingItem");
 const {
-  BAD_REQUEST,
-  DEFAULT,
-  NOT_FOUND,
-  FORBIDDEN,
+  BadRequestError,
+  ForbiddenError,
+  NotFoundError,
 } = require("../utils/errors");
 
-const deleteClothingItem = async (req, res) => {
+// DELETE item
+const deleteClothingItem = async (req, res, next) => {
   const { itemId } = req.params;
   const userId = req.user._id;
 
@@ -15,66 +14,50 @@ const deleteClothingItem = async (req, res) => {
     const item = await clothingItems.findById(itemId).orFail();
 
     if (item.owner.toString() !== userId) {
-      return res
-        .status(FORBIDDEN)
-        .send({ message: "You do not have permission to delete this item" });
+      return next(
+        new ForbiddenError("You do not have permission to delete this item")
+      );
     }
 
     await item.remove();
     return res.status(200).send({ message: "Item deleted successfully" });
-  } catch (errors) {
-    console.error(errors);
-    if (errors.name === "DocumentNotFoundError") {
-      return res.status(NOT_FOUND).send({ message: "Item not found" });
+  } catch (err) {
+    if (err.name === "DocumentNotFoundError") {
+      return next(new NotFoundError("Item not found"));
     }
-    if (errors.name === "CastError") {
-      return res.status(BAD_REQUEST).send({ message: "Invalid ID format" });
+    if (err.name === "CastError") {
+      return next(new BadRequestError("Invalid ID format"));
     }
-    return res.status(DEFAULT).send({ message: errors.message });
+    return next(err);
   }
 };
-const createItem = async (req, res) => {
+
+// CREATE item
+const createItem = async (req, res, next) => {
   const { name, imageUrl, weather } = req.body;
   const owner = req.user._id;
 
   try {
     const item = await clothingItems.create({ name, imageUrl, weather, owner });
     return res.status(201).send({ data: item });
-  } catch (errors) {
-    if (errors.name === "ValidationError") {
-      // Handle validation error
-      return res.status(BAD_REQUEST).send({ message: errors.message });
+  } catch (err) {
+    if (err.name === "ValidationError") {
+      return next(new BadRequestError(err.message));
     }
-    console.error(errors);
-    return res.status(DEFAULT).send({ message: errors.message });
+    return next(err);
   }
 };
 
-const getItems = (req, res) => {
+// GET all items
+const getItems = (req, res, next) => {
   clothingItems
     .find({})
     .then((items) => res.status(200).send(items))
-    .catch((errors) => {
-      console.error(errors);
-      return res.status(DEFAULT).send({ message: "Get items error" });
-    });
+    .catch((err) => next(err));
 };
 
-// const updateItem = (req, res) => {
-//   const { itemId } = req.params;
-//   const { imageUrl } = req.body;
-//   console.log(itemId, imageUrl);
-//   clothingItems
-//     .findByIdAndUpdate(itemId, { $set: { imageUrl } })
-//     .orFail()
-//     .then((item) => res.status(200).send({ data: item }))
-//     .catch((err) => {
-//       console.error(err);
-//       res.status(500).send({ message: "Update items error" });
-//     });
-// };
-
-const likeItem = (req, res) => {
+// LIKE item
+const likeItem = (req, res, next) => {
   const { itemId } = req.params;
   clothingItems
     .findByIdAndUpdate(
@@ -83,21 +66,20 @@ const likeItem = (req, res) => {
       { new: true }
     )
     .orFail()
-    .then((item) => {
-      res.status(200).send({ data: item });
-    })
-    .catch((errors) => {
-      if (errors.name === "DocumentNotFoundError") {
-        return res.status(NOT_FOUND).send({ message: errors.message });
+    .then((item) => res.status(200).send({ data: item }))
+    .catch((err) => {
+      if (err.name === "DocumentNotFoundError") {
+        return next(new NotFoundError("Item not found"));
       }
-      if (errors.name === "CastError") {
-        return res.status(BAD_REQUEST).send({ message: errors.message });
+      if (err.name === "CastError") {
+        return next(new BadRequestError("Invalid ID format"));
       }
-      return res.status(DEFAULT).send({ message: "Like item error" });
+      return next(err);
     });
 };
 
-const dislikeItem = (req, res) => {
+// DISLIKE item
+const dislikeItem = (req, res, next) => {
   const { itemId } = req.params;
   clothingItems
     .findByIdAndUpdate(
@@ -107,14 +89,14 @@ const dislikeItem = (req, res) => {
     )
     .orFail()
     .then((item) => res.status(200).send({ data: item }))
-    .catch((errors) => {
-      if (errors.name === "DocumentNotFoundError") {
-        return res.status(NOT_FOUND).send({ message: errors.message });
+    .catch((err) => {
+      if (err.name === "DocumentNotFoundError") {
+        return next(new NotFoundError("Item not found"));
       }
-      if (errors.name === "CastError") {
-        return res.status(BAD_REQUEST).send({ message: errors.message });
+      if (err.name === "CastError") {
+        return next(new BadRequestError("Invalid ID format"));
       }
-      return res.status(DEFAULT).send({ message: "Dislike item error" });
+      return next(err);
     });
 };
 

@@ -3,14 +3,14 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 const { JWT_SECRET } = require("../utils/config");
 const {
-  BAD_REQUEST,
-  NOT_FOUND,
-  DEFAULT,
-  UNAUTHORIZED,
-  CONFLICT,
+  BadRequestError,
+  NotFoundError,
+  UnauthorizedError,
+  ConflictError,
 } = require("../utils/errors");
 
-const createUser = async (req, res) => {
+// CREATE user
+const createUser = async (req, res, next) => {
   const { name, avatar, email, password } = req.body;
 
   try {
@@ -27,36 +27,36 @@ const createUser = async (req, res) => {
     return res.status(201).send(userWithoutPassword);
   } catch (errors) {
     if (errors.code === 11000) {
-      // Handle duplicate email error
-      return res.status(CONFLICT).send({ message: "Email already exists" });
+      // Duplicate email error
+      return next(new ConflictError("Email already exists"));
     }
     if (errors.name === "ValidationError") {
-      // Handle validation error
-      return res.status(BAD_REQUEST).send({ message: errors.message });
+      // Validation error
+      return next(new BadRequestError(errors.message));
     }
-    console.error(errors);
-    return res.status(DEFAULT).send({ message: errors.message }); // Use DEFAULT for 500 status code
+    return next(errors);
   }
 };
 
-const getCurrentUser = (req, res) => {
+// GET current user
+const getCurrentUser = (req, res, next) => {
   const userId = req.user._id;
   User.findById(userId)
     .orFail()
     .then((userData) => res.status(200).send({ data: userData }))
     .catch((errors) => {
-      console.error(errors);
       if (errors.name === "DocumentNotFoundError") {
-        return res.status(NOT_FOUND).send({ message: "User not found" });
+        return next(new NotFoundError("User not found"));
       }
       if (errors.name === "CastError") {
-        return res.status(BAD_REQUEST).send({ message: "Invalid ID format" });
+        return next(new BadRequestError("Invalid ID format"));
       }
-      return res.status(DEFAULT).send({ message: errors.message }); // Use DEFAULT for 500 status code
+      return next(errors);
     });
 };
 
-const updateUser = async (req, res) => {
+// UPDATE user
+const updateUser = async (req, res, next) => {
   const userId = req.user._id;
   const { name, avatar } = req.body;
 
@@ -69,24 +69,22 @@ const updateUser = async (req, res) => {
 
     return res.status(200).send({ data: updatedUser });
   } catch (errors) {
-    console.error(errors);
     if (errors.name === "DocumentNotFoundError") {
-      return res.status(NOT_FOUND).send({ message: "User not found" });
+      return next(new NotFoundError("User not found"));
     }
     if (errors.name === "ValidationError") {
-      return res.status(BAD_REQUEST).send({ message: errors.message });
+      return next(new BadRequestError(errors.message));
     }
-    return res.status(DEFAULT).send({ message: errors.message });
+    return next(errors);
   }
 };
 
-const login = async (req, res) => {
+// LOGIN user
+const login = async (req, res, next) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
-    return res
-      .status(BAD_REQUEST)
-      .send({ message: "Email and password are required" });
+    return next(new BadRequestError("Email and password are required"));
   }
 
   try {
@@ -94,13 +92,10 @@ const login = async (req, res) => {
     const token = jwt.sign({ _id: user._id }, JWT_SECRET, { expiresIn: "7d" });
     return res.send({ token });
   } catch (errors) {
-    console.error(errors);
     if (errors.message === "Invalid email or password") {
-      return res
-        .status(UNAUTHORIZED)
-        .send({ message: "Invalid email or password" });
+      return next(new UnauthorizedError("Invalid email or password"));
     }
-    return res.status(DEFAULT).send({ message: errors.message });
+    return next(errors);
   }
 };
 
