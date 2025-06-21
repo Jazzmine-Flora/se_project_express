@@ -20,6 +20,12 @@ mongoose
 app.use(express.json());
 app.use(cors());
 
+app.get("/crash-test", () => {
+  setTimeout(() => {
+    throw new Error("Server will crash now");
+  }, 0);
+});
+
 app.use(requestLogger); // before routes
 // Use routes from index.js
 app.use(routes);
