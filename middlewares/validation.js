@@ -62,6 +62,16 @@ module.exports.validateLogin = celebrate({
   }),
 });
 
+module.exports.validateUserUpdate = celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().min(2).max(30).required(),
+    avatar: Joi.string().required().custom(validateURL).messages({
+      "string.empty": 'The "avatar" field must be filled in',
+      "string.uri": 'The "avatar" field must be a valid url',
+    }),
+  }),
+});
+
 // 4. Validate user and clothing item IDs in params
 module.exports.validateId = celebrate({
   params: Joi.object().keys({
