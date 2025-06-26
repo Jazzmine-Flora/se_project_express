@@ -1,9 +1,9 @@
 const router = require("express").Router();
 const { getCurrentUser, updateUser } = require("../controllers/users");
 const auth = require("../middlewares/auth");
-const { celebrate, Joi } = require("celebrate");
+// const { celebrate, Joi } = require("celebrate");
 const { validateUserUpdate } = require("../middlewares/validation");
-const { validate } = require("../models/user");
+// const { validate } = require("../models/user");
 
 // Validation middleware for updating user profile
 // const validateUpdateUser = celebrate({

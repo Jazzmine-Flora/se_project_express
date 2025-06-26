@@ -1,9 +1,7 @@
 const clothingItems = require("../models/clothingItem");
-const {
-  BadRequestError,
-  ForbiddenError,
-  NotFoundError,
-} = require("../utils/errors");
+const BadRequestError = require("../errors/BadRequestError");
+const NotFoundError = require("../errors/NotFoundError");
+const ForbiddenError = require("../errors/ForbiddenError");
 
 // DELETE item
 const deleteClothingItem = async (req, res, next) => {

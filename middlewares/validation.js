@@ -80,11 +80,7 @@ module.exports.validateId = celebrate({
       "string.hex": "ID must be a hexadecimal value",
       "string.empty": "ID must be provided",
     }),
-    userId: Joi.string().hex().length(24).messages({
-      "string.length": "ID must be 24 characters",
-      "string.hex": "ID must be a hexadecimal value",
-      "string.empty": "ID must be provided",
-    }),
+    // userId removed as there are no routes that use this parameter
   }),
 });
 
