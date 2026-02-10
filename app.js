@@ -9,16 +9,19 @@ const errorHandler = require("./middlewares/error-handler");
 const { requestLogger, errorLogger } = require("./middlewares/logger");
 
 const app = express();
-const { PORT = 3001 } = process.env;
+const {
+  PORT = 3001,
+  MONGODB_URI = "mongodb://127.0.0.1:27017/wtwr_db",
+  CORS_ORIGINS =
+    "https://www.wat2wear.twilightparadox.com,https://wat2wear.twilightparadox.com,http://localhost:3000",
+} = process.env;
 
-const allowedOrigins = [
-  "https://www.wat2wear.twilightparadox.com",
-  "https://wat2wear.twilightparadox.com",
-  "http://localhost:3000", // for local dev, optional
-];
+const allowedOrigins = CORS_ORIGINS.split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
 
 mongoose
-  .connect("mongodb://127.0.0.1:27017/wtwr_db")
+  .connect(MONGODB_URI)
   .then(() => {
     // console.log("Connected to db"); // Removed to resolve the no-console warning
   })
